@@ -1,6 +1,6 @@
 ---
 - name: Upgrade all packages
-  ansible.builtin.dnf:
+  ansible.builtin.yum:
     name: "*"
     state: latest
 
@@ -34,8 +34,6 @@
     regexp: '^Banner'
     insertafter: '^#Banner'
     line: Banner /etc/issue.net
-
-- name: Restart sshd service
-  ansible.builtin.service:
-    name: sshd
-    state: restarted
+  
+  notify:
+    -  Restart sshd service
