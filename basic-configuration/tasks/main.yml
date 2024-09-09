@@ -1,0 +1,41 @@
+---
+- name: Upgrade all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+- name: Ensure firewall active
+  ansible.builtin.service:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: Ensure SELinux is set to enforcing mode
+  ansible.builtin.lineinfile:
+    path: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: SELINUX=enforcing
+
+- name: Add banner file
+  ansible.builtin.lineinfile:
+    path: /etc/issue
+    line: this server is ready to use
+    create: yes
+
+- name: Add ssh banner file
+  ansible.builtin.lineinfile:
+    path: /etc/issue.net
+    line: this server is ready to use
+    create: yes
+
+- name: Allow ssh to use banner file
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Banner'
+    insertafter: '^#Banner'
+    line: Banner /etc/issue.net
+
+- name: Restart sshd service
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
