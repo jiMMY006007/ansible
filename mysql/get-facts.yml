@@ -1,0 +1,8 @@
+---
+- name: node facts
+  hosts: apache
+
+  tasks:
+    - name: get facts
+      debug:
+        var: ansible_facts

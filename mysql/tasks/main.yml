@@ -1,0 +1,37 @@
+---
+- name: Install the MySQL community repository  
+  ansible.builtin.yum_repository:
+    name: mysql80-community
+    description: MySQL 8.0 Community Server
+    baseurl: http://repo.mysql.com/yum/mysql-8.0-community/el/8/$basearch  
+    gpgcheck: yes
+    enabled: yes
+    gpgkey: https://repo.mysql.com/RPM-GPG-KEY-mysql
+    state: present
+
+#- name: Download .rpm package  
+#  get_url:  
+#    url: https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-community-server-8.0.39-1.el7.x86_64.rpm  
+#    dest: /tmp/mysql-community-server-8.0.39-1.el7.x86_64.rpm  
+
+- name: Install MySQL server  
+  ansible.builtin.yum:  
+    name: mysql-community-server #/tmp/mysql-community-server-8.0.39-1.el7.x86_64.rpm
+    state: present  
+
+- name: Start MySQL service  
+  ansible.builtin.service:
+    name: mysqld
+    state: started
+    enabled: yes
+
+- name: Get the initial MySQL root password  
+  command: grep 'temporary password' /var/log/mysqld.log  
+  register: mysql_temp_password  
+  changed_when: false
+
+- name: Print MySQL temporary password  
+  debug:  
+    msg: "Temporary MySQL root password: {{ mysql_temp_password.stdout.split(' ')[-1] }}"
+
+  
