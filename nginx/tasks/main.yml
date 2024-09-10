@@ -1,0 +1,28 @@
+---
+- name: Install nginx
+  ansible.builtin.yum:
+    name: nginx
+    state: latest
+
+- name: Start and enable nginx.service
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Allow service port
+  ansible.posix.firewalld:
+    service: http
+    permanent: true
+    state: enabled
+
+- name: Check Nginx connection  
+  uri:  
+    url: http://{{ ansible_facts['default_ipv4']['address'] }}  
+    method: GET  
+    status_code: 200  # expecting 200 OK response  
+  register: nginx_response  
+
+- name: Display response  
+  debug:  
+    var: nginx_response 
