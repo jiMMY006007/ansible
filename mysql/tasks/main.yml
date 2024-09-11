@@ -1,22 +1,38 @@
 ---
-- name: Install the MySQL community repository  
-  ansible.builtin.yum_repository:
-    name: mysql80-community
-    description: MySQL 8.0 Community Server
-    baseurl: http://repo.mysql.com/yum/mysql-8.0-community/el/8/$basearch  
-    gpgcheck: yes
-    enabled: yes
-    gpgkey: https://repo.mysql.com/RPM-GPG-KEY-mysql
+- name: Download .rpm mysql repo  
+  command: wget -P /tmp https://dev.mysql.com/get/mysql84-community-release-el8-1.noarch.rpm
+#  get_url:
+#    url: https://dev.mysql.com/get/mysql84-community-release-el8-1.noarch.rpm
+#    dest: /tmp/mysql84-community-release-el8-1.noarch.rpm
+
+
+- name: Install MySQL repo  
+  ansible.builtin.dnf:  
+    name: /tmp/mysql84-community-release-el8-1.noarch.rpm
     state: present
 
-#- name: Download .rpm package  
-#  get_url:  
-#    url: https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-community-server-8.0.39-1.el7.x86_64.rpm  
-#    dest: /tmp/mysql-community-server-8.0.39-1.el7.x86_64.rpm  
+- name: Disable mysql-8.4-lts-community repo
+  #command: dnf config-manager --disable mysql-tools-8.4-lts-community
+  community.general.ini_file:
+    path: /etc/yum.repos.d/mysql-community.repo
+    section: mysql-8.4-lts-community
+    option: enabled
+    value: 0
+
+- name: Enable mysql80-community repo
+  #command: dnf config-manager --enable mysql80-community
+  community.general.ini_file:
+    path: /etc/yum.repos.d/mysql-community.repo
+    section: mysql80-community
+    option: enabled
+    value: 1
+
+- name: Disable default redhat mysql module
+  command: dnf module disable mysql
 
 - name: Install MySQL server  
   ansible.builtin.yum:  
-    name: mysql-community-server #/tmp/mysql-community-server-8.0.39-1.el7.x86_64.rpm
+    name: mysql-community-server
     state: present  
 
 - name: Start MySQL service  
@@ -33,5 +49,3 @@
 - name: Print MySQL temporary password  
   debug:  
     msg: "Temporary MySQL root password: {{ mysql_temp_password.stdout.split(' ')[-1] }}"
-
-  

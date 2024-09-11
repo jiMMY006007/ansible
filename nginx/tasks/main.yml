@@ -1,5 +1,5 @@
 ---
-- name: Install nginx
+- name: Install Nginx
   ansible.builtin.yum:
     name: nginx
     state: latest
@@ -25,4 +25,4 @@
 
 - name: Display response  
   debug:  
-    var: nginx_response 
+    var: nginx_response
