@@ -1,10 +1,6 @@
 ---
 - name: Download .rpm mysql repo  
   command: wget -P /tmp https://dev.mysql.com/get/mysql84-community-release-el8-1.noarch.rpm
-#  get_url:
-#    url: https://dev.mysql.com/get/mysql84-community-release-el8-1.noarch.rpm
-#    dest: /tmp/mysql84-community-release-el8-1.noarch.rpm
-
 
 - name: Install MySQL repo  
   ansible.builtin.dnf:  
